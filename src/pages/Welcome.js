@@ -114,7 +114,7 @@ const Button = styled(NavLink)`
   }
 `;
 
-const Welcome = ({ owner, setOwner, name, setName, age, setAge, boy, setBoy, girl, setGirl }) => {
+const Welcome = ({ owner, setOwner, name, setName, age, setAge, gender, setGender }) => {
   const handleStartClick = async () => {
     try {
       const response = await axios.post('your-server-endpoint', { ownerName: owner }, {
@@ -143,11 +143,11 @@ const Welcome = ({ owner, setOwner, name, setName, age, setAge, boy, setBoy, gir
           <Age placeholder="AGE" value={age} onChange={(e) => setAge(e.target.value)}/>
           <Gender>
             <CheckboxContainer>
-              <Checkbox type="checkbox" name="gender" value={boy} onChange={(e) => setBoy(!boy)} />
+              <Checkbox type="checkbox" name="gender" value={gender} onChange={(e) => setGender('boy')} />
               <CheckboxLabel>BOY</CheckboxLabel>
             </CheckboxContainer>
             <CheckboxContainer>
-              <Checkbox type="checkbox" name="gender" value={girl} onChange={(e) => setGirl(!girl)}/>
+              <Checkbox type="checkbox" name="gender" value={gender} onChange={(e) => setGender('girl')}/>
               <CheckboxLabel>GIRL</CheckboxLabel>
             </CheckboxContainer>
           </Gender>

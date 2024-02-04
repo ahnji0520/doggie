@@ -41,15 +41,15 @@ const Img = styled.img`
   margin: 30px auto;
 `;
 
-const Profile = ({ name, age, boy, girl }) => {
+const Profile = ({ name, age, gender }) => {
   return(
     <Background>
       <Block>
         <Title>PROFILE.</Title>
-        <Img alt="snoopy" src="image/snoopy.jpg" />
+        <Img alt="snoopy" src="image/snoopy.png" />
         <Text>{name}</Text>
         <Text>{age} years old</Text>
-        <Text>{boy ? 'Boy' : 'Girl'}</Text>
+        <Text>{gender}</Text>
         <Title>_</Title>
       </Block>
     </Background>

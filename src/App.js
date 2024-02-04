@@ -6,13 +6,13 @@ import Welcome from "./pages/Welcome";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import Diary from "./pages/diary";
+import Read from "./pages/read";
 
 const App = () => {
   const [owner, setOwner] = useState('');
   const [name, setName] = useState('');
-  const [age, setAge] = useState('');
-  const [boy, setBoy] = useState(false);
-  const [girl, setGirl] = useState(false);
+  const [age, setAge] = useState(0);
+  const [gender, setGender] = useState('');
 
   const [date, setDate] = useState(new Date());
 
@@ -27,19 +27,21 @@ const App = () => {
             setName={setName}
             age={age}
             setAge={setAge}
-            boy={boy}
-            setBoy={setBoy}
-            girl={girl}
-            setGirl={setGirl} />} />
+            gender={gender}
+            setGender={setGender} />} />
           <Route path='home' element={<Home 
             date={date}
             setDate={setDate} />} />
           <Route path='profile' element={<Profile 
             name={name}
             age={age}
-            boy={boy}
-            girl={girl} />} />
+            gender={gender} />} />
           <Route path='diary' element={<Diary 
+            date={date}
+            owner={owner}
+            age={age}
+            gender={gender} />} />
+          <Route path='read' element={<Read 
             date={date} />} />
         </Route>
       </Routes>

@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import Calendar from "react-calendar";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import './Home.css';
@@ -18,32 +18,62 @@ const Background = styled.div`
 const Home = ({date, setDate}) => {
   const navigate = useNavigate();
   const [displayedMonth, setDisplayedMonth] = useState(date.toISOString().slice(0, 7));
+  const [diaryData, setDiaryData] = useState([]);
 
-  const handleDateChange = (selectedDate) => {
+  const handleDateChange = async (selectedDate) => {
     setDate(selectedDate);
 
-    navigate(`/diary?selectedDate=${selectedDate}`);
+    // 서버에 해당 날짜의 Diary가 있는지 확인
+    const matchingDiaryEntry = diaryData.find(entry => entry.calendar_date === selectedDate.toISOString().slice(0, 10));
+
+    // Diary가 있으면 Read 페이지로 이동, 아니면 Diary 페이지로 이동
+    if (matchingDiaryEntry) {
+      navigate(`/read?selectedDate=${selectedDate}`);
+    } else {
+      navigate(`/diary?selectedDate=${selectedDate}`);
+    }
+  };
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/api/diary/list', { month: displayedMonth });
+      console.log('Server response:', response.data);
+      setDiaryData(response.data);
+    } catch (error) {
+      console.error('Error sending data to server:', error);
+    }
   };
 
   const handleViewChange = ({ activeStartDate }) => {
     const month = activeStartDate.toISOString().slice(0, 7);
     setDisplayedMonth(month);
-
-    axios.post('YOUR_SERVER_ENDPOINT', { date: month })
-      .then(response => {
-        console.log('Server response:', response.data);
-      })
-      .catch(error => {
-        console.error('Error sending data to server:', error);
-      });
   };
 
-  const tileContent = ({ date, view }) => {
-    // Custom logic to determine if a circle should be drawn on this date
-    // For example, you can check if the date is today or has some special condition
-    const shouldDrawCircle = true;
+  useEffect(() => {
+    fetchData(); // 컴포넌트가 마운트될 때 데이터 가져오기
+  }, [displayedMonth]); //
 
-    return shouldDrawCircle ? <div className="circle"></div> : null;
+  const tileContent = ({ date }) => {
+    const matchingDiaryEntry = diaryData.find(entry => entry.calendar_date === date.toISOString().slice(0, 10));
+
+    if (matchingDiaryEntry) {
+      const mood = matchingDiaryEntry.mood;
+  
+      // Define colors based on mood
+      const moodColors = {
+        bad: "#454545",
+        neutral: "#65B741",
+        good: "#FFB534",
+      };
+  
+      // Get the color based on mood, default to grey if mood is not recognized
+      const circleColor = moodColors[mood] || "#F4EEEE";
+  
+      return <div className="circle" style={{ backgroundColor: circleColor }}></div>;
+    } else {
+      // No entry for the date, draw a grey circle
+      return <div className="circle" style={{ backgroundColor: "#F4EEEE" }}></div>;
+    }
   };
 
   return(

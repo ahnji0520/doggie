@@ -1,6 +1,8 @@
 import styled from "styled-components";
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import moment from 'moment';
+import axios from "axios";
+import { useNavigate } from 'react-router-dom';
 
 const Background = styled.div`
   display: flex;
@@ -115,12 +117,60 @@ const Generate = styled.button`
   }
 `;
 
-const Diary = ({date}) => {
+const Diary = ({ date, owner, age, gender }) => {
+  const navigate = useNavigate();
   useEffect(() => {
     console.log('Received date in Diary:', date);
   }, [date]);
 
   const activeDate = moment(date).format('MMMM D, YYYY');
+
+  const [selectedOptions, setSelectedOptions] = useState({
+    food: "",
+    water: "",
+    snack: "",
+    walk: "",
+    poop: "",
+    mood: "",
+    event: "",
+    date: date,
+    owner: owner,
+    age: age,
+    gender: gender
+  });
+
+  const handleCheckboxChange = (category, value) => {
+    setSelectedOptions(prevState => ({
+      ...prevState,
+      [category]: value,
+    }));
+  };
+
+  const handleGenerateDiary = () => {
+    const requestData = {
+      food: selectedOptions.food,
+      water: selectedOptions.water,
+      snack: selectedOptions.snack,
+      walk: selectedOptions.walk,
+      poop: selectedOptions.poop,
+      mood: selectedOptions.mood,
+      event: selectedOptions.event,
+      diary_date: moment(date).format("YYYY-MM-DD"), 
+      owner: owner, 
+      age: age, 
+      gender: gender,
+    };
+
+    axios
+      .post('http://127.0.0.1:8000/api/diary/create', requestData)
+      .then((response) => {
+        console.log("Diary generated successfully:", response.data);
+        navigate('/read');
+      })
+      .catch((error) => {
+        console.error("Error generating diary:", error);
+      });
+  };
 
   return(
     <Background>
@@ -138,8 +188,9 @@ const Diary = ({date}) => {
                   <Label>
                     <Checkbox
                       type="checkbox"
+                      onChange={() => handleCheckboxChange("food", "none")}
                     />
-                    A Bit
+                    None
                   </Label>  
                 </CheckboxContainer>
                 <CheckboxContainer>
@@ -147,8 +198,9 @@ const Diary = ({date}) => {
                   <Label>
                     <Checkbox
                       type="checkbox"
+                      onChange={() => handleCheckboxChange("food", "a bit")}
                     />
-                    Moderate
+                    A Bit
                   </Label>  
                 </CheckboxContainer>
                 <CheckboxContainer>
@@ -156,8 +208,9 @@ const Diary = ({date}) => {
                   <Label>
                     <Checkbox
                       type="checkbox"
+                      onChange={() => handleCheckboxChange("food", "moderate")}
                     />
-                    A Lot
+                    Moderate
                   </Label>  
                 </CheckboxContainer>
               </RowBlock>
@@ -172,6 +225,7 @@ const Diary = ({date}) => {
                   <Label>
                     <Checkbox
                       type="checkbox"
+                      onChange={() => handleCheckboxChange("water", "a bit")}
                     />
                     A Bit
                   </Label>
@@ -181,6 +235,7 @@ const Diary = ({date}) => {
                   <Label>
                     <Checkbox
                       type="checkbox"
+                      onChange={() => handleCheckboxChange("water", "moderate")}
                     />
                     Moderate
                   </Label>
@@ -190,6 +245,7 @@ const Diary = ({date}) => {
                   <Label>
                     <Checkbox
                       type="checkbox"
+                      onChange={() => handleCheckboxChange("water", "a lot")}
                     />
                     A Lot
                   </Label>
@@ -206,6 +262,7 @@ const Diary = ({date}) => {
                   <Label>
                     <Checkbox
                       type="checkbox"
+                      onChange={() => handleCheckboxChange("snack", "have")}
                     />
                     Have
                   </Label>
@@ -215,6 +272,7 @@ const Diary = ({date}) => {
                   <Label>
                     <Checkbox
                       type="checkbox"
+                      onChange={() => handleCheckboxChange("snack", "have not")}
                     />
                     Have Not
                   </Label>
@@ -231,6 +289,7 @@ const Diary = ({date}) => {
                   <Label>
                     <Checkbox
                       type="checkbox"
+                      onChange={() => handleCheckboxChange("poop", "did")}
                     />
                     Did
                   </Label>
@@ -240,6 +299,7 @@ const Diary = ({date}) => {
                   <Label>
                     <Checkbox
                       type="checkbox"
+                      onChange={() => handleCheckboxChange("poop", "did not")}
                     />
                     Did Not
                   </Label>
@@ -256,6 +316,7 @@ const Diary = ({date}) => {
                   <Label>
                     <Checkbox
                       type="checkbox"
+                      onChange={() => handleCheckboxChange("walk", "did")}
                     />
                     Did
                   </Label>
@@ -265,6 +326,7 @@ const Diary = ({date}) => {
                   <Label>
                     <Checkbox
                       type="checkbox"
+                      onChange={() => handleCheckboxChange("walk", "did not")}
                     />
                     Did Not
                   </Label>
@@ -281,6 +343,7 @@ const Diary = ({date}) => {
                   <Label>
                     <Checkbox
                       type="checkbox"
+                      onChange={() => handleCheckboxChange("mood", "bad")}
                     />
                     Bad
                   </Label>
@@ -290,6 +353,7 @@ const Diary = ({date}) => {
                   <Label>
                     <Checkbox
                       type="checkbox"
+                      onChange={() => handleCheckboxChange("mood", "neutral")}
                     />
                     Neutral
                   </Label>
@@ -299,6 +363,7 @@ const Diary = ({date}) => {
                   <Label>
                     <Checkbox
                       type="checkbox"
+                      onChange={() => handleCheckboxChange("mood", "good")}
                     />
                     Good
                   </Label>
@@ -313,43 +378,49 @@ const Diary = ({date}) => {
                 <Label2>
                   <Checkbox
                     type="checkbox"
+                    onChange={() => handleCheckboxChange("event", "good friend")}
                   />
                   Met Good Friend
                 </Label2>
                 <Label2>
                   <Checkbox
                     type="checkbox"
+                    onChange={() => handleCheckboxChange("event", "bad friend")}
                   />
                   Met Annoying Friend
                 </Label2>
                 <Label2>
                   <Checkbox
                     type="checkbox"
+                    onChange={() => handleCheckboxChange("event", "new toy")}
                   />
                   Lonely Day
                 </Label2>
                 <Label2>
                   <Checkbox
                     type="checkbox"
+                    onChange={() => handleCheckboxChange("event", "alone day")}
                   />
                   Played with toys
                 </Label2>
                 <Label2>
                   <Checkbox
                     type="checkbox"
+                    onChange={() => handleCheckboxChange("event", "special treat")}
                   />
                   Special Treat
                 </Label2>
                 <Label2>
                   <Checkbox
                     type="checkbox"
+                    onChange={() => handleCheckboxChange("event", "sick")}
                   />
                   Sick
                 </Label2>
               </ColumnBlock>
             </Option>
           </Block>
-          <Generate>
+          <Generate onClick={handleGenerateDiary}>
             GENERATE DIARY
           </Generate>
         </RightContent>
